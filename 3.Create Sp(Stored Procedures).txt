@@ -1,0 +1,179 @@
+create or replace function GetAllUsuarios()
+returns table ("usuario_Id" integer,
+			   "usuario_Nombre" text, 
+			   "usuario_Direccion" text, 
+			   "usuario_Telefono" text, 
+			   "usuario_MunicipioId" integer,
+			   "municipio_Id" integer,
+			   "municipio_Nombre" text,
+			   "municipio_DepartamentoId" integer,
+			   "departamento_Id" integer,
+			   "departamento_Nombre" text,
+			   "departamento_PaisId" integer,
+			   "pais_Id" integer,
+			   "pais_Nombre" text) language sql as $$
+			   
+    SELECT u."Id" as "usuario_Id", 
+			u."Nombre" as "usuario_Nombre", 
+			u."Direccion" as "usuario_Direccion", 
+			u."Telefono" as "usuario_Telefono",
+			u."MunicipioId" as "usuario_MunicipioId",
+			m."Id" as "municipio_Id", 
+			m."Nombre" as "municipio_Nombre",
+			m."DepartamentoId" as "departamento_Id",
+			d."Id" as "departamento_Id",
+			d."Nombre" as "departamento_Nombre",
+			d."PaisId" as "departamento_PaisId",
+			p."Id" as "pais_Id",
+			p."Nombre" as "pais_Nombre"
+	FROM dbo."Usuarios" as u
+	INNER JOIN dbo."Municipios" as m ON u."MunicipioId" = m."Id"
+	INNER JOIN dbo."Departamentos" as d ON m."DepartamentoId" = d."Id"
+	INNER JOIN dbo."Paises" as p ON d."PaisId" = p."Id"
+$$;
+
+
+
+
+
+create or replace function GetUsuarioById(usuarioId integer)
+returns table ("usuario_Id" integer,
+			   "usuario_Nombre" text, 
+			   "usuario_Direccion" text, 
+			   "usuario_Telefono" text, 
+			   "usuario_MunicipioId" integer,
+			   "municipio_Id" integer,
+			   "municipio_Nombre" text,
+			   "municipio_DepartamentoId" integer,
+			   "departamento_Id" integer,
+			   "departamento_Nombre" text,
+			   "departamento_PaisId" integer,
+			   "pais_Id" integer,
+			   "pais_Nombre" text) language sql as $$
+			   
+    SELECT u."Id" as "usuario_Id", 
+			u."Nombre" as "usuario_Nombre", 
+			u."Direccion" as "usuario_Direccion", 
+			u."Telefono" as "usuario_Telefono",
+			u."MunicipioId" as "usuario_MunicipioId",
+			m."Id" as "municipio_Id", 
+			m."Nombre" as "municipio_Nombre",
+			m."DepartamentoId" as "departamento_Id",
+			d."Id" as "departamento_Id",
+			d."Nombre" as "departamento_Nombre",
+			d."PaisId" as "departamento_PaisId",
+			p."Id" as "pais_Id",
+			p."Nombre" as "pais_Nombre"
+	FROM dbo."Usuarios" as u
+	INNER JOIN dbo."Municipios" as m ON u."MunicipioId" = m."Id"
+	INNER JOIN dbo."Departamentos" as d ON m."DepartamentoId" = d."Id"
+	INNER JOIN dbo."Paises" as p ON d."PaisId" = p."Id"
+	where u."Id" = usuarioId
+	fetch first 1 rows only
+$$;
+
+
+CREATE OR REPLACE FUNCTION GetPaisByName(nombre text)
+RETURNS TABLE ("pais_Id" integer,
+			   "pais_Nombre" text) LANGUAGE SQL AS $$
+			   
+    SELECT  p."Id" AS "pais_Id",
+			p."Nombre" AS "pais_Nombre"
+	FROM dbo."Paises" AS p
+	WHERE LOWER(p."Nombre") = LOWER(nombre)
+	FETCH FIRST 1 ROWS ONLY
+$$;
+
+CREATE OR REPLACE FUNCTION GetDptoByPaisAndName(nombre text, paisId integer)
+RETURNS TABLE ("departamento_Id" integer,
+			   "departamento_Nombre" text,
+			   "departamento_PaisId" integer) LANGUAGE SQL AS $$
+			   
+    SELECT  d."Id" AS "departamento_Id",
+			d."Nombre" AS "departamento_Nombre",
+			d."PaisId" AS "departamento_PaisId"
+	FROM dbo."Departamentos" AS d
+	WHERE LOWER(d."Nombre") = LOWER(nombre) AND d."PaisId" = paisId
+	FETCH FIRST 1 ROWS ONLY
+$$;
+
+CREATE OR REPLACE FUNCTION GetMunicipioByDptoAndName(nombre text, departamentoId integer)
+RETURNS TABLE ("municipio_Id" integer,
+			   "municipio_Nombre" text,
+			   "municipio_DepartamentoId" integer) LANGUAGE SQL AS $$
+			   
+    SELECT  m."Id" AS "municipio_Id", 
+			m."Nombre" AS "municipio_Nombre",
+			m."DepartamentoId" AS "departamento_Id"
+	FROM dbo."Municipios" AS m
+	WHERE LOWER(m."Nombre") = LOWER(nombre) AND m."DepartamentoId" = departamentoId
+	FETCH FIRST 1 ROWS ONLY
+$$;
+
+CREATE OR REPLACE FUNCTION GetMunicipioById(municipioId integer)
+RETURNS TABLE ("municipio_Id" integer,
+			   "municipio_Nombre" text,
+			   "municipio_DepartamentoId" integer) LANGUAGE SQL AS $$
+			   
+    SELECT  m."Id" AS "municipio_Id", 
+			m."Nombre" AS "municipio_Nombre",
+			m."DepartamentoId" AS "departamento_Id"
+	FROM dbo."Municipios" AS m
+	WHERE m."Id" = municipioId
+	FETCH FIRST 1 ROWS ONLY
+$$;
+
+CREATE OR REPLACE FUNCTION GetAllMunicipios()
+RETURNS TABLE ("municipio_Id" integer,
+			   "municipio_Nombre" text,
+			   "municipio_DepartamentoId" integer) LANGUAGE SQL AS $$
+			   
+    SELECT  m."Id" AS "municipio_Id", 
+			m."Nombre" AS "municipio_Nombre",
+			m."DepartamentoId" AS "departamento_Id"
+	FROM dbo."Municipios" AS m
+$$;
+
+CREATE OR REPLACE FUNCTION GetDepartamentoById(departamentoId integer)
+RETURNS TABLE ("departamento_Id" integer,
+			   "departamento_Nombre" text,
+			   "departamento_PaisId" integer) LANGUAGE SQL AS $$
+			   
+    SELECT  d."Id" AS "departamento_Id",
+			d."Nombre" AS "departamento_Nombre",
+			d."PaisId" AS "departamento_PaisId"
+	FROM dbo."Departamentos" AS d
+	WHERE d."Id" = departamentoId
+	FETCH FIRST 1 ROWS ONLY
+$$;
+
+CREATE OR REPLACE FUNCTION GetAllDepartamentos()
+RETURNS TABLE ("departamento_Id" integer,
+			   "departamento_Nombre" text,
+			   "departamento_PaisId" integer) LANGUAGE SQL AS $$
+			   
+    SELECT  d."Id" AS "departamento_Id",
+			d."Nombre" AS "departamento_Nombre",
+			d."PaisId" AS "departamento_PaisId"
+	FROM dbo."Departamentos" AS d
+$$;
+
+CREATE OR REPLACE FUNCTION GetPaisById(paisId integer)
+RETURNS TABLE ("pais_Id" integer,
+			   "pais_Nombre" text) LANGUAGE SQL AS $$
+			   
+    SELECT  p."Id" AS "pais_Id",
+			p."Nombre" AS "pais_Nombre"
+	FROM dbo."Paises" AS p
+	WHERE p."Id" = paisId
+	FETCH FIRST 1 ROWS ONLY
+$$;
+
+CREATE OR REPLACE FUNCTION GetAllPaises()
+RETURNS TABLE ("pais_Id" integer,
+			   "pais_Nombre" text) LANGUAGE SQL AS $$
+			   
+    SELECT  p."Id" AS "pais_Id",
+			p."Nombre" AS "pais_Nombre"
+	FROM dbo."Paises" AS p
+$$;			
